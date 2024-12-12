@@ -1,6 +1,5 @@
 package com.example.screenmatch.service;
 
-import com.example.screenmatch.model.DataSerie;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
