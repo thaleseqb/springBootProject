@@ -1,5 +1,6 @@
 package com.example.screenmatch.main;
 
+import com.example.screenmatch.model.EpisodeData;
 import com.example.screenmatch.model.SeasonData;
 import com.example.screenmatch.model.SerieData;
 import com.example.screenmatch.service.ApiSerie;
@@ -35,6 +36,16 @@ public class Main {
             season = converter.getData(json, SeasonData.class);
             seasons.add(season);
         }
-        seasons.forEach(System.out::println);
+
+//        seasons.forEach(System.out::println); with this command we can reduce code syntax
+
+        seasons.forEach(t -> {
+            int sizeList = t.episodeList().size();
+            List<EpisodeData> episodeData = t.episodeList();
+            for (int index = 0; index < sizeList; index++) {
+                String title = episodeData.get(index).title();
+                System.out.println(title);
+            }
+        });
     }
 }
