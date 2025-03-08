@@ -1,14 +1,19 @@
 package com.example.screenmatch.main;
 
+import com.example.screenmatch.model.Episode;
 import com.example.screenmatch.model.EpisodeData;
 import com.example.screenmatch.model.SeasonData;
 import com.example.screenmatch.model.SerieData;
 import com.example.screenmatch.service.ApiSerie;
 import com.example.screenmatch.service.DataConvert;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -47,5 +52,39 @@ public class Main {
                 System.out.println(title);
             }
         });
+
+        List<EpisodeData> episodesData = seasons.stream()
+                .flatMap(t -> t.episodeList().stream())
+                .collect(Collectors.toList()); // this list is mutable. Using only .toList returns an immutable list
+
+        episodesData.stream()
+                .filter(t -> !t.votes().equalsIgnoreCase("N/A"))
+                .sorted(Comparator.comparing(EpisodeData::votes).reversed())
+                .limit(5)
+                .forEach(System.out::println);
+
+        List<Episode> episodes = seasons.stream()
+                .flatMap(t -> t.episodeList().stream()
+                        .map(d -> new Episode(t.number(), d))
+                ).collect(Collectors.toList());
+
+        episodes.forEach(System.out::println);
+
+        System.out.println("From which date do you want to watch?");
+        var year = scan.nextInt();
+        scan.nextLine();
+
+        LocalDate searchDate = LocalDate.of(year, 1, 1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        episodes.stream()
+                .filter(e -> {
+                    return (e.getLaunchingDate() != null)
+                            && e.getLaunchingDate().isAfter(searchDate);
+                }).forEach(e -> System.out.println(
+                        "Season " + e.getSeason() +
+                                " Episode " + e.getTitle() +
+                                " Launching Date " + e.getLaunchingDate().format(formatter)
+                ));
     }
 }
