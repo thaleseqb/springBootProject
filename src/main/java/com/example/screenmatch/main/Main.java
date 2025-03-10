@@ -9,10 +9,7 @@ import com.example.screenmatch.service.DataConvert;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -70,6 +67,23 @@ public class Main {
 
         episodes.forEach(System.out::println);
 
+        System.out.println("Insert the episode title you desire to search");
+        var titleExcerpt = scan.nextLine();
+
+        Optional<Episode> episodeSearched = episodes.stream()
+                .filter(e -> e.getTitle().toLowerCase().contains(
+                        titleExcerpt.toLowerCase()
+                ))
+                .findFirst();
+
+        if (!episodeSearched.isEmpty()) {
+            System.out.println("Episode was found!");
+            System.out.println("This is the episode's season: " + episodeSearched.get().getSeason());
+        } else {
+            System.out.println("Episode was not found!");
+        }
+
+
         System.out.println("From which date do you want to watch?");
         var year = scan.nextInt();
         scan.nextLine();
@@ -86,5 +100,18 @@ public class Main {
                                 " Episode " + e.getTitle() +
                                 " Launching Date " + e.getLaunchingDate().format(formatter)
                 ));
+
+        Map<Integer, Double> votesPerSeason = episodes.stream()
+                .filter(e -> e.getVotes() > 0.0)
+                .collect(Collectors.groupingBy(Episode::getSeason,
+                        Collectors.averagingDouble(Episode::getVotes)));
+
+        System.out.println(votesPerSeason);
+
+        DoubleSummaryStatistics est = episodes.stream()
+                .filter(e -> e.getVotes() > 0.0)
+                .collect(Collectors.summarizingDouble(Episode::getVotes));
+
+        System.out.println(est);
     }
 }
